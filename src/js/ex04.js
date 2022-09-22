@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import dat from 'dat.gui';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-// 안개 만들기
+// -----그룹
 export default function example() {
   const canvas = document.getElementById('three-canvas');
   const renderer = new THREE.WebGLRenderer({
@@ -23,9 +23,6 @@ export default function example() {
   );
 
   camera.position.set(1, 3, 5);
-  // camera.position.x = 1;
-  // camera.position.y = 3;
-  // camera.position.z = 5;
 
   // scene(무대)에 카메라를 추가해준는것
   scene.add(camera);
@@ -38,33 +35,38 @@ export default function example() {
   light.position.z = 2;
   scene.add(light);
 
-  // AxesHelper
-  const axesHelper = new THREE.AxesHelper(3);
-  scene.add(axesHelper)
+  // controls
+  const controls = new OrbitControls(camera, renderer.domElement);
 
-  // GridHelper
-  const gridHelper = new THREE.GridHelper(5);
-  scene.add(gridHelper);
-
-  const geometry = new THREE.BoxGeometry(1, 1, 1);
+  // Mesh
+  const geometry = new THREE.SphereGeometry(1, 64, 64);
   const meterial = new THREE.MeshStandardMaterial({
-    color: '#ff0000'
+    color: 'orangered',
+    side: THREE.DoubleSide,
+    flatShading: true
   });
 
-  const mesh = new THREE.Mesh(geometry, meterial);
-  scene.add(mesh);
-  mesh.scale.set(5, 0.1, 5);
+  const group1 = new THREE.Group();
+  const box1 = new THREE.Mesh(geometry, meterial);
+
+  const group2 = new THREE.Group();
+  const box2 = box1.clone();
+  box2.scale.set(0.3, 0.3, 0.3);
+  group2.position.x = 3;
+
+  const group3 = new THREE.Group();
+  const box3 = box1.clone();
+  box3.scale.set(0.15, 0.15, 0.15);
+  group3.position.x = 0.8;
+
+  group3.add(box3);
+  group2.add(box2, group3);
+  group1.add(box1, group2);
+
+  scene.add(group1);
 
 
-  // dat.GUI
-  // 요소를 브라우저에서 눈으로 보며 조절 해 줄 수 있게 도와주는 라이브러리
-  // npm i dat.gui로 설치 후 import 해서 사용
-  const gui = new dat.GUI;
-  // gui.add(조절하고싶은 오브젝트, '속성', 범위 최소, 범위 최대, 조절 할 수 있는 양);
-  gui.add(mesh.position, 'y', -5, 5, 0.01).name('y 위치');
-  gui.add(camera.position, 'x', -10, 10, 0.01).name('카메라 x 위치');
-
-  camera.lookAt(mesh.position);
+  camera.lookAt(group1.position);
 
   renderer.render(scene, camera);
 
@@ -74,10 +76,12 @@ export default function example() {
   const drew = () => {
     const time = clock.getDelta();
     // 카메라가 계속 요소 바라보게
-    camera.lookAt(mesh.position);
+    camera.lookAt(group1.position);
     // mesh.rotation.x = THREE.MathUtils.degToRad(90);
 
-    mesh.rotation.y += 1 * time;
+    group1.rotation.y += 0.5 * time;
+    group2.rotation.y += 0.5 * time;
+    group3.rotation.y += 0.5 * time;
     renderer.render(scene, camera);
     renderer.setAnimationLoop(drew);
   }
