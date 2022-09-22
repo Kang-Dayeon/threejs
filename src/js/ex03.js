@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import dat from 'dat.gui';
 
 // 안개 만들기
 export default function example() {
@@ -51,15 +50,8 @@ export default function example() {
   });
 
   const mesh = new THREE.Mesh(geometry, meterial);
+  mesh.position.x = 2;
   scene.add(mesh);
-
-  // dat.GUI
-  // 요소를 브라우저에서 눈으로 보며 조절 해 줄 수 있게 도와주는 라이브러리
-  // npm i dat.gui로 설치 후 import 해서 사용
-  const gui = new dat.GUI;
-  // gui.add(조절하고싶은 오브젝트, '속성', 범위 최소, 범위 최대, 조절 할 수 있는 양);
-  gui.add(mesh.position, 'y', -5, 5, 0.01).name('y 위치');
-  gui.add(camera.position, 'x', -10, 10, 0.01).name('카메라 x 위치');
 
   camera.lookAt(mesh.position);
 
@@ -70,8 +62,6 @@ export default function example() {
   // 애니메이션
   const drew = () => {
     const time = clock.getDelta();
-    // 카메라가 계속 요소 바라보게
-    camera.lookAt(mesh.position);
     mesh.rotation.y += 1 * time;
     renderer.render(scene, camera);
     renderer.setAnimationLoop(drew);
@@ -82,7 +72,6 @@ export default function example() {
     // 카메라 종횡비 설정
     camera.aspect = innerWidth / innerHeight;
     camera.updateProjectionMatrix();
-
     // 랜더러 설정
     renderer.setSize(innerWidth, innerHeight);
     renderer.render(scene, camera);
