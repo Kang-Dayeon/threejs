@@ -15,6 +15,10 @@
 // 만화 느낌
 // import example from "./ex08.js";
 // matcap
-import example from "./ex09.js";
+// import example from "./ex09.js";
+// import example from "./ex10.js";
+// cubemap
+// import example from "./ex11.js";
+import example from "./ex12.js";
 
 example();
