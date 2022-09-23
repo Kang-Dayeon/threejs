@@ -11,6 +11,10 @@
 // 카메라 조정
 // import example from "./ex06.js";
 // material 텍스쳐 여러개 넣기(마인크레프트 블럭만들기)
-import example from "./ex07.js";
+// import example from "./ex07.js";
+// 만화 느낌
+// import example from "./ex08.js";
+// matcap
+import example from "./ex09.js";
 
 example();
