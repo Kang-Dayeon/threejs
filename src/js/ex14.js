@@ -5,7 +5,6 @@ import { ImagePanel } from './imagePanel';
 import gsap from 'gsap';
 
 // ----- 주제: 기본 Geometry 파티클
-
 export default function example() {
   // Renderer
   const canvas = document.querySelector('#three-canvas');
@@ -45,33 +44,19 @@ export default function example() {
 
 
   // Mesh
-  const planeGeometry = new THREE.PlaneGeometry(0.3, 0.3);
+  const geometry = new THREE.SphereGeometry(1, 32, 32);
+  // 파티클 만들 수 있는 material
+  const material = new THREE.PointsMaterial({
+    size: 1.2,
+    sizeAttenuation: false
+  });
+  // 파티클 만들때는 points를 사용해야함
+  const points = new THREE.Points(geometry, material);
 
+  // const mesh = new THREE.Mesh(geometry, material); 
 
-  const textureLoader = new THREE.TextureLoader();
+  scene.add(points);
 
-  const sphereGeometry = new THREE.SphereGeometry(1, 8, 8);
-  const spherePositionArray = sphereGeometry.attributes.position.array;
-  const randomPositionArray = [];
-  for (let i = 0; i < spherePositionArray.length; i++) {
-    randomPositionArray.push((Math.random() - 0.5) * 10);
-  }
-
-  const imagePanels = [];
-  let imagePanel;
-  for (let i = 0; i < spherePositionArray.length; i += 3) {
-    imagePanel = new ImagePanel({
-      textureLoader,
-      scene,
-      geometry: planeGeometry,
-      imageSrc: `./../images/0${Math.ceil(Math.random() * 5)}.jpg`,
-      x: spherePositionArray[i],
-      y: spherePositionArray[i + 1],
-      z: spherePositionArray[i + 2],
-    });
-
-    imagePanels.push(imagePanel);
-  }
   // 그리기
   const clock = new THREE.Clock();
 
@@ -91,75 +76,9 @@ export default function example() {
     renderer.render(scene, camera);
   }
 
-  function setShape(e) {
-    const type = e.target.dataset.type;
-    let array;
-    switch (type) {
-      case 'random':
-        console.log('random');
-        array = randomPositionArray;
-        break;
-      case 'sphere':
-        console.log('sphere');
-        array = spherePositionArray;
-        break;
-    }
 
-    for (let i = 0; i < imagePanels.length; i++) {
-      gsap.to(
-        imagePanels[i].mesh.position,
-        {
-          duration: 2,
-          x: array[i * 3],
-          y: array[i * 3 + 1],
-          z: array[i * 3 + 2],
-        }
-      )
-      // 회전
-      if (type === 'random') {
-        gsap.to(
-          imagePanels[i].mesh.rotation,
-          {
-            duration: 2,
-            x: 0,
-            y: 0,
-            z: 0
-          }
-        )
-      } else if (type === 'sphere') {
-        gsap.to(
-          imagePanels[i].mesh.rotation,
-          {
-            duration: 2,
-            x: imagePanels[i].sphereRotationX,
-            y: imagePanels[i].sphereRotationY,
-            z: imagePanels[i].sphereRotationZ
-          }
-        )
-      }
-    }
-  }
-
-  // 버튼
-  const btnWrapper = document.createElement('div');
-  btnWrapper.classList.add('btns');
-
-  const randomBtn = document.createElement('button');
-  randomBtn.dataset.type = 'random';
-  randomBtn.style.cssText = 'position: absolute; left: 20px; top: 20px;';
-  randomBtn.innerHTML = 'Random';
-  btnWrapper.append(randomBtn);
-
-  const sphereBtn = document.createElement('button');
-  sphereBtn.dataset.type = 'sphere';
-  sphereBtn.style.cssText = 'position: absolute; left: 20px; top: 50px;';
-  sphereBtn.innerHTML = 'Sphere';
-  btnWrapper.append(sphereBtn);
-
-  document.body.append(btnWrapper);
 
   // 이벤트
-  btnWrapper.addEventListener('click', setShape);
   window.addEventListener('resize', setSize);
 
   draw();
