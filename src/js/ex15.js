@@ -46,7 +46,8 @@ export default function example() {
     flatShading: true
   });
   const wireMaterial = new THREE.MeshStandardMaterial({
-    wireframe: true
+    wireframe: true,
+    color: '#F4F2FC'
   })
   const phongMaterial = new THREE.MeshPhongMaterial({
     color: 'blue'
@@ -71,30 +72,73 @@ export default function example() {
 
   torusMesh.position.x = 2;
 
+  const positionArr = box1.geometry.attributes.position.array;
+  for (let i = 0; i < positionArr.length; i += 3) {
+    positionArr[i] = positionArr[i] + (Math.random() - 0.5) * 0.2;
+    positionArr[i + 1] = positionArr[i + 1] + (Math.random() - 0.5) * 0.2;
+    positionArr[i + 2] = positionArr[i + 2] + (Math.random() - 0.5) * 0.2;
+  }
+
+
   group1.add(box1, box2);
   group2.add(box3, torusMesh);
-
   scene.add(group1, group2);
 
+  // 파티클
+  const bufferGeometry = new THREE.BufferGeometry();
+  const count = 5000;
+  const position = new Float32Array(count * 3);
+  for (let i = 0; i < position.length; i++) {
+    position[i] = (Math.random() - 0.5) * 10;
+  };
+  bufferGeometry.setAttribute(
+    'position',
+    new THREE.BufferAttribute(position, 3)
+  );
 
+  const positionMaterial = new THREE.PointsMaterial({
+    size: 0.006,
+    transparent: true,
+    depthWrite: true,
+    color: 0x888888
+  });
 
+  const particle = new THREE.Points(bufferGeometry, positionMaterial);
+  scene.add(particle);
 
   camera.lookAt(group1.position);
 
   renderer.render(scene, camera);
 
+
   const clock = new THREE.Clock();
+  console.log(group2.children);
+
 
   // 애니메이션
   const drew = () => {
     const time = clock.getDelta();
+    const r = Date.now() * 0.0003;
+
     // 카메라가 계속 요소 바라보게
     camera.lookAt(group1.position);
     // mesh.rotation.x = THREE.MathUtils.degToRad(90);
 
+    for (let i = 0; i < group1.children.length; i++) {
+      group1.children[i].position.x = Math.sin(r);
+      group1.children[i].position.y = Math.sin(r);
+      group1.children[i].position.z = Math.sin(r);
+    }
+    for (let i = 0; i < group2.children.length; i++) {
+      group2.children[i].position.x = Math.sin(r);
+      group2.children[i].position.y = Math.sin(r);
+      group2.children[i].position.z = Math.sin(r);
+    }
+
+    geometry.attributes.position.needsUpdate = true;
+
     group1.rotation.y += 0.3 * time;
     group2.rotation.y -= 0.6 * time;
-
 
     renderer.render(scene, camera);
     renderer.setAnimationLoop(drew);
